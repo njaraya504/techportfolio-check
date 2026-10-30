@@ -1,0 +1,851 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
+</head>
+<body>
+<title>GitHub Portfolio Check</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap">
+<style>
+/* Layout: one reading column; a navy masthead band, then input, a coaching summary, priority fixes, profile feedback, and per-project feedback. */
+:root{
+  --bg:#f6f7fa; --surface:#ffffff; --sunken:#eef1f6; --ink:#14213d; --muted:#56607a; --line:#d8dde8;
+  --navy:#012169; --navy-ink:#ffffff; --gold:#f2a900; --gold-soft:#fff4d6; --link:#0b3fa8;
+  --good:#1e7a46; --good-soft:#e3f3ea; --warn:#9a5b00; --warn-soft:#fdf0d8; --bad:#b42318; --bad-soft:#fde8e6;
+  --display:"IBM Plex Sans Condensed","Arial Narrow",Arial,sans-serif;
+  --body:"IBM Plex Sans",-apple-system,"Segoe UI",Roboto,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0c1220; --surface:#131c2e; --sunken:#1a2539; --ink:#e7ecf5; --muted:#a3adc2; --line:#2a3650;
+  --navy:#0f2a66; --navy-ink:#ffffff; --gold:#f5b82e; --gold-soft:#3a2d0c; --link:#9cbcff;
+  --good:#5fd08f; --good-soft:#12301f; --warn:#f2b552; --warn-soft:#352610; --bad:#ff8a7d; --bad-soft:#3a1714; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0c1220; --surface:#131c2e; --sunken:#1a2539; --ink:#e7ecf5; --muted:#a3adc2; --line:#2a3650;
+  --navy:#0f2a66; --navy-ink:#ffffff; --gold:#f5b82e; --gold-soft:#3a2d0c; --link:#9cbcff;
+  --good:#5fd08f; --good-soft:#12301f; --warn:#f2b552; --warn-soft:#352610; --bad:#ff8a7d; --bad-soft:#3a1714; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.55}
+a{color:var(--link)}
+.wrap{max-width:880px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0;line-height:1.15}
+code,.mono{font-family:var(--mono);font-size:.92em}
+.eyebrow{font-size:12px;letter-spacing:.09em;text-transform:uppercase;font-weight:600;color:var(--muted)}
+button{font:inherit;cursor:pointer}
+:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+
+.mast{background:var(--navy);color:var(--navy-ink);border-bottom:4px solid var(--gold)}
+.mast .wrap{padding-block:28px 24px;display:grid;gap:10px}
+.mast .eyebrow{color:#c9d3ea}
+.mast h1{font-size:clamp(30px,6vw,44px);font-weight:700;letter-spacing:-.01em}
+.mast p{margin:0;max-width:62ch;color:#dfe6f5}
+
+main .wrap{padding-block:24px 56px;display:grid;gap:28px}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:20px}
+.note{font-size:13.5px;color:var(--muted);margin:0}
+
+.form{display:grid;gap:16px}
+.row{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end}
+.field{display:grid;gap:6px;flex:1 1 260px;min-width:0}
+label.lbl{font-weight:600;font-size:14px}
+.inputwrap{display:flex;align-items:center;border:1px solid var(--line);border-radius:8px;background:var(--bg);overflow:hidden}
+.inputwrap span{padding:0 4px 0 12px;color:var(--muted);font-family:var(--mono);font-size:14px;white-space:nowrap}
+.inputwrap input{flex:1;min-width:0;border:0;background:transparent;color:var(--ink);font:500 15px var(--mono);padding:11px 12px 11px 2px}
+.inputwrap:focus-within{outline:3px solid var(--gold);outline-offset:1px}
+.inputwrap input:focus{outline:none}
+.btn{border:0;border-radius:8px;padding:11px 18px;font-weight:600;background:var(--navy);color:var(--navy-ink)}
+.btn:hover{filter:brightness(1.15)}
+.btn[disabled]{opacity:.55;cursor:progress}
+.btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+.btn.small{padding:6px 12px;font-size:13px}
+.status{font-size:14px;border-radius:8px;padding:10px 14px;margin:0}
+.status.err{background:var(--bad-soft);color:var(--ink);border-left:4px solid var(--bad)}
+.status.info{background:var(--sunken);color:var(--ink)}
+
+.picker{display:grid;gap:12px}
+.repolist{display:grid;gap:6px;max-height:360px;overflow:auto;padding:2px}
+.repolist label{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:start;padding:9px 12px;border:1px solid var(--line);border-radius:8px;cursor:pointer;background:var(--bg)}
+.repolist label:has(input:checked){border-color:var(--navy);background:var(--sunken)}
+.repolist input{margin-top:4px;accent-color:var(--navy)}
+.repolist .nm{font-family:var(--mono);font-weight:500;overflow-wrap:anywhere}
+.repolist .ds{font-size:13px;color:var(--muted);display:block}
+.repolist .lang{font-size:12px;color:var(--muted);white-space:nowrap}
+
+.banner{display:flex;gap:10px;align-items:baseline;background:var(--gold-soft);border-radius:8px;padding:10px 14px;font-size:14px}
+.banner b{font-family:var(--display);letter-spacing:.04em;text-transform:uppercase;font-size:13px}
+
+.summary{display:grid;grid-template-columns:auto 1fr;gap:24px;align-items:center}
+@media (max-width:560px){.summary{grid-template-columns:1fr}}
+.dial{position:relative;width:150px;height:150px}
+.dial svg{width:150px;height:150px;transform:rotate(-90deg)}
+.dial .num{position:absolute;inset:0;display:grid;place-content:center;text-align:center}
+.dial .num b{font-family:var(--display);font-size:46px;line-height:1;font-variant-numeric:tabular-nums}
+.dial .num small{color:var(--muted);font-size:12px}
+.who{display:flex;gap:12px;align-items:center;margin-bottom:10px}
+.who img{width:44px;height:44px;border-radius:50%;border:1px solid var(--line);object-fit:cover;background:var(--sunken)}
+.who .handle{font-family:var(--mono);font-size:14px;color:var(--muted)}
+.band{display:inline-block;font-weight:700;font-family:var(--display);font-size:20px}
+.cats{display:grid;gap:8px;margin-top:12px}
+.cat{display:grid;grid-template-columns:150px 1fr 54px;gap:10px;align-items:center;font-size:14px}
+@media (max-width:480px){.cat{grid-template-columns:110px 1fr 48px}}
+.bar{height:8px;border-radius:4px;background:var(--sunken);overflow:hidden}
+.bar i{display:block;height:100%;background:var(--navy);border-radius:4px}
+:root[data-theme="dark"] .bar i{background:var(--gold)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .bar i{background:var(--gold)}}
+.cat .pts{text-align:right;font-variant-numeric:tabular-nums;color:var(--muted)}
+
+.coachnote{background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--gold);border-radius:8px;padding:16px 18px;display:grid;gap:8px}
+.coachnote p{margin:0;max-width:68ch}
+
+h2{font-size:24px;font-weight:700}
+.sect{display:grid;gap:12px}
+.sect > p{margin:0;color:var(--muted);max-width:66ch}
+
+.fixes{list-style:none;margin:0;padding:0;display:grid;gap:10px;counter-reset:fix}
+.fixes li{display:grid;grid-template-columns:32px 1fr;gap:12px;padding:12px 14px;background:var(--surface);border:1px solid var(--line);border-radius:8px;counter-increment:fix}
+.fixes li::before{content:counter(fix);font-family:var(--display);font-weight:700;font-size:20px;color:var(--warn);line-height:1.2}
+.fixes .t{font-weight:600}
+.fixes .g{font-size:13px;color:var(--muted)}
+
+.checks{display:grid;border:1px solid var(--line);border-radius:10px;background:var(--surface);overflow:hidden}
+.check{display:grid;grid-template-columns:1fr auto;gap:6px 12px;padding:14px 16px;border-top:1px solid var(--line)}
+.check:first-child{border-top:0}
+.check .head{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.check .t{font-weight:600}
+.check .pts{font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
+.check .body{grid-column:1 / -1;display:grid;gap:6px;font-size:14px;min-width:0}
+.check .body p{margin:0}
+.why{color:var(--muted);font-size:13.5px}
+.try{background:var(--sunken);border-radius:6px;padding:8px 12px}
+.try b{font-weight:600}
+.pill{font-size:11.5px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;border-radius:999px;padding:2px 9px}
+.pill.pass{background:var(--good-soft);color:var(--good)}
+.pill.warn{background:var(--warn-soft);color:var(--warn)}
+.pill.fail{background:var(--bad-soft);color:var(--bad)}
+.pill.ask{background:var(--sunken);color:var(--muted)}
+.yn{display:flex;gap:6px;flex-wrap:wrap}
+.yn button{border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:999px;padding:4px 12px;font-size:13px}
+.yn button[aria-pressed="true"]{background:var(--navy);color:var(--navy-ink);border-color:var(--navy)}
+pre.snippet{margin:0;background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:10px 12px;font:12.5px/1.5 var(--mono);white-space:pre-wrap;overflow-wrap:anywhere;max-height:260px;overflow:auto}
+.copyrow{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+
+.repos{display:grid;gap:14px}
+.repo{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px 18px;display:grid;gap:14px}
+.repo header{display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px;align-items:baseline}
+.repo h3{font-family:var(--mono);font-size:17px;font-weight:500;overflow-wrap:anywhere}
+.repo h3 a{color:var(--ink);text-decoration:none}
+.repo h3 a:hover{text-decoration:underline}
+.repo .meta{font-size:13px;color:var(--muted)}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font-size:12.5px;border-radius:999px;padding:3px 10px;border:1px solid var(--line)}
+.chip.on{background:var(--good-soft);border-color:transparent;color:var(--ink)}
+.chip.on::before{content:"✓ ";color:var(--good);font-weight:700}
+.chip.off{color:var(--muted);border-style:dashed}
+.cov{font-size:13px;color:var(--muted)}
+.split{display:grid;grid-template-columns:1fr 1.4fr;gap:16px}
+@media (max-width:640px){.split{grid-template-columns:1fr}}
+.split > div{min-width:0;display:grid;gap:8px;align-content:start}
+.split h4{margin:0;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.wins,.grow{list-style:none;margin:0;padding:0;display:grid;gap:8px;font-size:14px}
+.wins li{display:grid;grid-template-columns:18px 1fr;gap:6px}
+.wins li::before{content:"✓";color:var(--good);font-weight:700}
+.grow li{display:grid;gap:4px;padding-left:12px;border-left:3px solid var(--warn-soft)}
+.grow li b{font-weight:600}
+.grow .how{color:var(--muted);font-size:13.5px}
+
+.reflect{margin:0;padding-left:20px;display:grid;gap:6px}
+.actions{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.foot{font-size:13px;color:var(--muted);border-top:1px solid var(--line);padding-top:16px}
+@media (prefers-reduced-motion: no-preference){.bar i{transition:width .5s ease}.dial circle.v{transition:stroke-dashoffset .6s ease}}
+@media print{.mast{background:none;color:#000;border-bottom:2px solid #000}.mast p,.mast .eyebrow{color:#000}#formPanel,#pickPanel,.actions,.yn,.copyrow{display:none!important}.panel,.repo,.check,.fixes li{break-inside:avoid}}
+</style>
+
+<header class="mast">
+  <div class="wrap">
+    <div class="eyebrow">Created by Nydia, Professional Career Coach</div>
+    <h1>GitHub Portfolio Check</h1>
+    <p>Get feedback on how your GitHub profile lines up with the <em>Building a Technical Portfolio</em> guide. The check looks at presentation the way a recruiter skims it: profile setup, READMEs, naming, and commit history. It does not review or grade your code.</p>
+  </div>
+</header>
+
+<main>
+  <div class="wrap">
+    <section class="panel" id="formPanel">
+      <form class="form" id="lookup" novalidate>
+        <div class="row">
+          <div class="field">
+            <label class="lbl" for="username">Your GitHub username</label>
+            <div class="inputwrap"><span>github.com/</span><input id="username" name="username" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="your-username" required></div>
+          </div>
+          <button class="btn" id="findBtn" type="submit">Find my repositories</button>
+        </div>
+        <p class="note">Everything runs in your browser using GitHub's public data. Nothing is saved or sent to Emory.</p>
+      </form>
+      <p class="status" id="status" role="status" hidden></p>
+    </section>
+
+    <section class="panel picker" id="pickPanel" hidden>
+      <div>
+        <div class="eyebrow">Step 2 of 2</div>
+        <h2>Pick the projects you'd show a recruiter</h2>
+        <p class="note">Choose the 3 to 5 repositories you have pinned (or plan to pin). We picked your most recently updated ones to start. Forks are hidden.</p>
+      </div>
+      <div class="repolist" id="repoList"></div>
+      <div class="actions">
+        <button class="btn" id="scanBtn" type="button">Check these projects and see my feedback</button>
+        <span class="note" id="pickCount"></span>
+      </div>
+    </section>
+
+    <div id="results" class="sect" style="gap:28px"></div>
+  </div>
+</main>
+
+<script>
+(() => {
+const GH = "https://api.github.com";
+const MAX_PICK = 6;
+const TRACK = "swe"; // Data science checks exist below but are switched off for now.
+const $ = (s, r = document) => r.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+
+/* ---------- Guide-based rules ---------- */
+const SECTIONS = {
+  swe: [
+    {key:"overview", label:"Overview", re:/overview|about|introduction|intro\b|description|summary|purpose|what (it|this) does/i,
+      prompt:"In two or three sentences, say what the project does, who it's for, and why you built it.", stub:"What does this project do, and who is it for? Why did you build it?"},
+    {key:"features", label:"Key features", re:/feature|functionalit|method|approach|how it works|architecture/i,
+      prompt:"List the three main things it does. The guide suggests three features per project.", stub:"- Feature one\n- Feature two\n- Feature three"},
+    {key:"tools", label:"Tools & technologies", re:/tool|technolog|tech stack|built with|\bstack\b|dependenc|languages|frameworks|libraries/i,
+      prompt:"Name the languages, frameworks, libraries, and platforms you used. Recruiters scan for these.", stub:"- Language:\n- Frameworks and libraries:\n- Platforms or services:"},
+    {key:"outcomes", label:"Outcomes", re:/outcome|result|finding|impact|output|what it produces/i,
+      prompt:"Say what the project produces or makes possible. Numbers help: users, time saved, records processed.", stub:"What does it produce, enable, or reveal? Include a number if you can."},
+    {key:"run", label:"How to run", re:/how to run|install|set ?up|getting started|usage|running|quick ?start|run locally|build/i,
+      prompt:"Write steps a non-expert could follow, starting from cloning the repository.", stub:"```\ngit clone <this repository's URL>\ncd <folder>\n<install command>\n<run command>\n```"},
+    {key:"learned", label:"What I learned", re:/learn|takeaway|reflection|lesson|challenge|next steps/i,
+      prompt:"Share one or two skills or insights you gained. This doubles as an interview story.", stub:"One or two skills or insights you gained, and a challenge you worked through."}
+  ],
+  ds: [
+    {key:"overview", label:"Overview", re:/overview|about|introduction|intro\b|description|summary|purpose|problem|question|objective/i, prompt:"", stub:""},
+    {key:"data", label:"Data source", re:/data ?source|dataset|\bdata\b|source/i, prompt:"", stub:""},
+    {key:"methods", label:"Methods", re:/method|approach|model|analysis|methodology|pipeline|process/i, prompt:"", stub:""},
+    {key:"findings", label:"Key findings", re:/finding|result|insight|conclusion|outcome/i, prompt:"", stub:""},
+    {key:"tools", label:"Tools & technologies", re:/tool|technolog|tech stack|built with|\bstack\b|dependenc|libraries|languages/i, prompt:"", stub:""},
+    {key:"run", label:"How to run", re:/how to run|install|set ?up|getting started|usage|running|reproduc|quick ?start/i, prompt:"", stub:""},
+    {key:"learned", label:"What I learned", re:/learn|takeaway|reflection|lesson|challenge|limitation|next steps/i, prompt:"", stub:""}
+  ]
+};
+const VISUAL_RE = /!\[[^\]]*\]\(|<img\s|\.(gif|png|jpe?g|webp)\b|public\.tableau\.com|youtu\.?be|loom\.com|vercel\.app|netlify\.app|github\.io|streamlit\.app|herokuapp|render\.com|\bdemo\b|screenshot/i;
+const PLACEHOLDER_RE = /coming soon|\bTODO\b|\bTBD\b|work in progress|\bWIP\b|lorem ipsum|under construction|to be added/i;
+const TEMPLATE_RE = /This project was bootstrapped with \[Create React App\]|This README would normally document|This template should help get you started developing with Vue|This is a \[Next\.js\] project bootstrapped|Currently, two official plugins are available/i;
+const VAGUE_NAME_RE = /^(final|finalproject|final-project|final_project|project|proj|test|testing|assignment|homework|hw|lab|untitled|demo|temp|tmp|repo|code|new|my-?project|stuff|practice|misc|sandbox|playground|hello-?world|first-?repo|example|sample)[-_]?\d*$/i;
+const COURSE_RE = /(^|[-_ ])(cs|cse|qtm|math|phys|ds|dsci|econ|stat|cit|isom|bios|info|eng|ece|ee|me)[-_ ]?\d{3}[a-z]?([-_ ]|$)/i;
+const MESSY_FILES = [
+  {re:/^\.DS_Store$/i, why:"a macOS system file", fix:"delete it and add .DS_Store to a .gitignore file"},
+  {re:/^__pycache__$/i, why:"a Python cache folder", fix:"delete it and add __pycache__/ to a .gitignore file"},
+  {re:/^\.ipynb_checkpoints$/i, why:"a notebook checkpoint folder", fix:"delete it and add .ipynb_checkpoints/ to a .gitignore file"},
+  {re:/^node_modules$/i, why:"installed packages", fix:"delete it and add node_modules/ to a .gitignore file; others install with npm install"},
+  {re:/(^|[_\-. ])(final|copy|old|backup|bak)([_\-. ]|$)/i, why:"a draft-style filename", fix:"rename it to say what the file does"},
+  {re:/(^|[_\-. ])v\d+([_\-. ]|$)/i, why:"a version number in the name", fix:"keep one version; Git already tracks history"},
+  {re:/^untitled/i, why:"an untitled file", fix:"rename it or delete it"},
+  {re:/^(test|scratch|temp|tmp)\d*\.(py|js|ts|java|ipynb|txt|r|cpp|c)$/i, why:"a leftover test file", fix:"delete it, or move real tests into a tests/ folder"},
+  {re:/\.(zip|rar|7z)$/i, why:"a zipped upload", fix:"unzip it and commit the files themselves so recruiters can browse them"},
+  {re:/[A-Z]{2,4}\d{3}/, why:"a course code in the name", fix:"rename it to describe what it does"}
+];
+const STOP = new Set("a an the and or of for to in on with that this my our is are by from into using via app tool project which who what how your it its".split(" "));
+
+/* ---------- Analysis (pure) ---------- */
+function headingsOf(md){
+  const lines = md.split(/\r?\n/), out = [];
+  for (let i=0;i<lines.length;i++){
+    const l = lines[i];
+    let m = l.match(/^\s{0,3}#{1,6}\s+(.+?)\s*#*\s*$/); if (m){ out.push(m[1]); continue; }
+    m = l.match(/^\s*(?:\*\*|__)(.{2,60}?)(?:\*\*|__)\s*:?\s*$/); if (m){ out.push(m[1]); continue; }
+    m = l.match(/^\s*<h[1-6][^>]*>(.*?)<\/h[1-6]>/i); if (m){ out.push(m[1].replace(/<[^>]+>/g,"")); continue; }
+    if (i>0 && /^\s*(=+|-+)\s*$/.test(l) && lines[i-1].trim() && !/^\s*[-*]/.test(lines[i-1])) out.push(lines[i-1].trim());
+  }
+  return out;
+}
+function introProse(md){
+  const lines = md.replace(/```[\s\S]*?```/g,"").split(/\r?\n/);
+  let seenTitle = false, prose = "";
+  for (const l of lines){
+    if (/^\s{0,3}#{1,6}\s/.test(l)){ if (seenTitle) break; seenTitle = true; continue; }
+    if (/^\s*(!\[|<img|\[!\[|<p align|<\/?(div|p|a)\b)/i.test(l)) continue;
+    prose += " " + l.trim();
+  }
+  return prose.trim();
+}
+function analyzeReadme(md, track){
+  const secs = SECTIONS[track];
+  if (!md) return {exists:false, found:[], missing:secs.map(s=>s.label), visual:false, coverage:0, short:false, placeholder:false, template:false, length:0};
+  const heads = headingsOf(md);
+  const found = [], missing = [];
+  for (const s of secs){
+    let hit = heads.some(h => s.re.test(h));
+    if (!hit && s.key==="overview" && introProse(md).length >= 80) hit = true;
+    (hit ? found : missing).push(s.label);
+  }
+  const visual = VISUAL_RE.test(md);
+  const length = md.replace(/\s+/g," ").trim().length;
+  const short = length < 300;
+  const placeholder = PLACEHOLDER_RE.test(md);
+  const template = TEMPLATE_RE.test(md);
+  let coverage = (found.length + (visual?1:0)) / (secs.length + 1);
+  if (short) coverage = Math.min(coverage, .3);
+  if (placeholder) coverage *= .7;
+  if (template) coverage = Math.min(coverage, .2);
+  return {exists:true, found, missing, visual, coverage, short, placeholder, template, length};
+}
+function suggestName(desc){
+  const words = (desc||"").toLowerCase().replace(/[^a-z0-9\s-]/g," ").split(/\s+/).filter(w=>w && !STOP.has(w));
+  return words.length >= 2 ? words.slice(0,3).join("-") : "";
+}
+function nameStatus(name, desc){
+  const sug = suggestName(desc);
+  const sugText = sug ? ` Based on your description, something like <code>${esc(sug)}</code> could work.` : " Aim for two to four words that describe the work, like <code>personal-budget-app</code>.";
+  if (VAGUE_NAME_RE.test(name)) return {s:"fail", msg:`Rename <code>${esc(name)}</code>. A recruiter scanning your pins can't tell what it is.${sugText}`};
+  if (COURSE_RE.test(name)) return {s:"warn", msg:`The course code in <code>${esc(name)}</code> won't mean anything outside Emory. Lead with what the project does.${sugText}`};
+  if (name.replace(/[-_.]/g,"").length <= 3) return {s:"warn", msg:`<code>${esc(name)}</code> is very short. A descriptive name is easier to scan.${sugText}`};
+  return {s:"pass", msg:"Clear, descriptive repository name."};
+}
+function messyFiles(contents){
+  const hits = [];
+  for (const f of contents || []){
+    if (/^(readme|license|licence|changelog|contributing)/i.test(f.name)) continue;
+    const rule = MESSY_FILES.find(r => r.re.test(f.name));
+    if (rule) hits.push({name:f.name, why:rule.why, fix:rule.fix});
+  }
+  return hits;
+}
+function commitStats(commits){
+  const dates = (commits || []).map(c => c?.commit?.author?.date || c?.commit?.committer?.date).filter(Boolean);
+  const days = new Set(dates.map(d => d.slice(0,10)));
+  return {count:dates.length, days:days.size, dates, capped:(commits||[]).length>=100};
+}
+function analyzeRepo(raw, track){
+  const {repo, readme, contents, commits} = raw;
+  const rd = analyzeReadme(readme, track);
+  const nm = nameStatus(repo.name, repo.description);
+  const messy = messyFiles(contents);
+  const cs = commitStats(commits);
+  let commitS = "fail";
+  if (cs.count >= 5 && cs.days >= 3) commitS = "pass";
+  else if (cs.count >= 2 && cs.days >= 2) commitS = "warn";
+  return {repo, rd, nm, messy, cs, commitS, readme, described: !!(repo.description && repo.description.trim().length >= 8)};
+}
+function analyzeProfile(user, social, profileReadme){
+  const bio = (user.bio||"").trim();
+  const links = [user.blog, ...(social||[]).map(s=>s.url)].filter(Boolean).join(" ") + " " + (profileReadme||"");
+  const hasLinkedIn = /linkedin\.com/i.test(links) || (social||[]).some(s=>s.provider==="linkedin");
+  const hasOther = !!(user.blog || (social||[]).length || /https?:\/\//i.test(profileReadme||""));
+  const pr = profileReadme || "";
+  const prSkills = /python|java|javascript|typescript|sql|\br\b|c\+\+|react|tableau|power ?bi|pandas|skills|tech stack|tools|languages/i.test(pr);
+  const prContact = /linkedin|mailto:|@[a-z0-9.-]+\.[a-z]|email|contact|reach me|connect with me/i.test(pr);
+  const odd = /\d{3,}|xx|420|69|lol|gamer|noob|_{2,}|-{2,}/i.test(user.login);
+  return {bio, hasLinkedIn, hasOther, prExists: pr.trim().length > 0, prLen: pr.replace(/\s+/g," ").trim().length, prSkills, prContact, oddName: odd};
+}
+
+/* ---------- Starters students can copy ---------- */
+function readmeStarter(r){
+  const secs = SECTIONS[TRACK];
+  const baseName = (r.nm.s !== "pass" && suggestName(r.repo.description)) || r.repo.name;
+  const title = baseName.replace(/[-_]+/g," ").replace(/\b\w/g,c=>c.toUpperCase());
+  const parts = [`# ${title}`, "", r.repo.description || "One sentence on what this project does.", "", "![Screenshot of the project](docs/screenshot.png)", ""];
+  secs.forEach(s=>{
+    if (s.key==="overview"){ parts.push("## Overview", "", r.repo.description ? `${r.repo.description}. Add who it's for and why you built it.` : s.stub, ""); return; }
+    if (s.key==="tools" && r.repo.language){ parts.push("## Tools & Technologies", "", `- Language: ${r.repo.language}`, "- Frameworks and libraries:", "- Platforms or services:", ""); return; }
+    if (s.key==="run"){ parts.push("## How to Run", "", "```", `git clone ${r.repo.html_url || "<this repository's URL>"}`, `cd ${r.repo.name}`, "<install command>", "<run command>", "```", ""); return; }
+    parts.push(`## ${s.label.replace("&","and")}`, "", s.stub, "");
+  });
+  return parts.join("\n");
+}
+function profileStarter(state){
+  const u = state.user;
+  const langs = [...new Set(state.repos.map(r=>r.repo.language).filter(Boolean))];
+  return [
+    `# Hi, I'm ${u.name ? u.name.split(" ")[0] : u.login}`, "",
+    u.bio || "[Your major] at Emory University, interested in [the kind of work you want to do].", "",
+    "## What I'm working on", "- [A current project or class you're excited about]", "",
+    "## Skills", `- Languages: ${langs.length ? langs.join(", ") : "[Python, Java, ...]"}`, "- Tools: [Git, VS Code, ...]", "",
+    "## Featured projects", ...state.repos.slice(0,3).map(r=>`- [${r.repo.name}](${r.repo.html_url || "#"}): ${r.repo.description || "one line on what it does"}`), "",
+    "## Connect", "- LinkedIn: [your LinkedIn URL]", "- Email: [a personal email you'll keep]"
+  ].join("\n");
+}
+
+/* ---------- Feedback and scoring ---------- */
+const SELF_QS = [
+  {id:"photo", cat:"profile", pts:5, t:"Professional profile photo", q:"Is your profile photo a clear, professional photo of you?",
+    why:"Your photo is the first thing a recruiter sees, before any code.",
+    next:"Use a clear headshot with good lighting. The photo you use on LinkedIn works well. On GitHub, click your avatar, then Settings, then upload a new picture.", fix:"Add a clear, professional headshot as your profile photo.", g:"Part 2, Setting Up Your Profile"},
+  {id:"email", cat:"profile", pts:4, t:"Account tied to a personal email", q:"Is this account connected to a personal email you'll keep after graduation (not your Emory email)?",
+    why:"You lose access to your Emory email after graduation, and with it the ability to recover this account.",
+    next:"In GitHub Settings, open Emails, add a Gmail or Outlook address, and make it your primary email. Your Emory address can stay as a secondary one.", fix:"Connect your GitHub account to a personal email you'll keep after graduation.", g:"Part 2, Important Note"},
+  {id:"pinned", cat:"lineup", pts:5, t:"3 to 5 pinned repositories", q:"Have you pinned 3 to 5 repositories that show your best and most relevant work?",
+    why:"Pinned projects are what recruiters open first. Without pins, GitHub shows whatever you touched most recently.",
+    next:"On your profile page, click Customize your pins and choose the projects you checked here. Put your strongest one first.", fix:"Pin 3 to 5 of your strongest, most relevant projects.", g:"Part 2, Setting Up Your Profile"}
+];
+const CAT_INFO = {profile:{label:"Profile setup", max:30}, lineup:{label:"Project lineup", max:10}, readme:{label:"READMEs", max:35}, org:{label:"Organization", max:15}, activity:{label:"Commit history", max:10}};
+const listNames = arr => arr.map(n=>`<code>${esc(n)}</code>`).join(", ");
+
+function buildChecks(state){
+  const {profile:p, repos} = state;
+  const items = [];
+  const add = o => items.push(o);
+
+  // Bio
+  if (p.bio.length >= 15) add({cat:"profile", pts:6, earned:6, s:"pass", t:"Bio that describes your focus",
+    saw:`Your bio reads: "${esc(p.bio)}". It tells a recruiter what you're about in one line.`});
+  else add({cat:"profile", pts:6, earned:p.bio?3:0, s:p.bio?"warn":"fail", t:"Bio that describes your focus",
+    saw: p.bio ? `Your bio reads: "${esc(p.bio)}". That's a start, but it's short enough that a recruiter won't learn your focus from it.` : "Your profile doesn't have a bio yet.",
+    why:"Recruiters read your bio before anything else, so it's your one-line introduction.",
+    next:"Try this pattern: <i>[Major] at Emory · interested in [field] · building [kind of projects]</i>. For example: <i>CS at Emory · interested in backend engineering · building tools for student life</i>.",
+    fix:"Write a one-line bio that names your focus area.", g:"Part 2, Setting Up Your Profile"});
+
+  // Username
+  if (!p.oddName) add({cat:"profile", pts:4, earned:4, s:"pass", t:"Professional username", saw:`<code>${esc(state.user.login)}</code> reads as professional.`});
+  else add({cat:"profile", pts:4, earned:2, s:"warn", t:"Professional username",
+    saw:`<code>${esc(state.user.login)}</code> includes numbers or slang that can read like a gaming handle.`,
+    why:"Your username is in every link you share, including on your resume.",
+    next:"Your name or a close variation is ideal. GitHub lets you change it in Settings, under Account. Old links redirect for a while, but update your resume and LinkedIn afterward.",
+    fix:"Consider changing your username to your name or a close variation.", g:"Part 2, Setting Up Your Profile"});
+
+  // Links
+  if (p.hasLinkedIn) add({cat:"profile", pts:5, earned:5, s:"pass", t:"Links to LinkedIn and other platforms", saw:"Your LinkedIn is linked, so a recruiter can move from your code to your story in one click."});
+  else add({cat:"profile", pts:5, earned:p.hasOther?3:0, s:p.hasOther?"warn":"fail", t:"Links to LinkedIn and other platforms",
+    saw: p.hasOther ? "You link to a site, but we didn't find your LinkedIn." : "We didn't find any links on your profile or Profile README.",
+    why:"Recruiters often want to see your experience and coursework alongside your projects.",
+    next:"Click Edit profile and add your LinkedIn under Social accounts. Add it to your Profile README too.",
+    fix:"Add your LinkedIn to your profile and Profile README.", g:"Part 2, Setting Up Your Profile"});
+
+  // Profile README
+  if (!p.prExists) add({cat:"profile", pts:6, earned:0, s:"fail", t:"Profile README",
+    saw:"You don't have a Profile README yet. That's the section that appears at the top of your profile page.",
+    why:"It's your elevator pitch. It's the first thing on the page and the easiest place to show focus, skills, and how to reach you.",
+    next:`Create a public repository named exactly <code>${esc(state.user.login)}</code> and check "Add a README file." Then paste the starter below and make it yours.`,
+    snippet: profileStarter(state), snippetLabel:"Copy Profile README starter",
+    fix:"Create a Profile README with your focus, skills, and contact info.", g:"Part 2, Setting Up Your Profile"});
+  else if (p.prSkills && p.prContact && p.prLen >= 200) add({cat:"profile", pts:6, earned:6, s:"pass", t:"Profile README", saw:"Your Profile README covers your skills and how to reach you. Nice work."});
+  else {
+    const gaps = [!p.prSkills && "the skills and tools you use", !p.prContact && "how to reach you (LinkedIn or a personal email)", p.prLen < 200 && "a bit more about what you're working on"].filter(Boolean);
+    add({cat:"profile", pts:6, earned:3, s:"warn", t:"Profile README",
+      saw:"You have a Profile README, which many students skip. Good start.",
+      why:"Treat it like an elevator pitch: focus area, skills, featured work, and contact.",
+      next:`To round it out, add ${gaps.join(", and ")}. The starter below shows one way to organize it.`,
+      snippet: profileStarter(state), snippetLabel:"Copy Profile README starter",
+      fix:`Round out your Profile README with ${gaps[0]}.`, g:"Part 2, Setting Up Your Profile"});
+  }
+
+  // Lineup
+  const documented = repos.filter(r=>r.rd.exists && !r.rd.short);
+  if (documented.length >= 3) add({cat:"lineup", pts:5, earned:5, s:"pass", t:"At least 3 documented projects", saw:`${documented.length} of your projects have a real README. That's the range the guide recommends.`});
+  else add({cat:"lineup", pts:5, earned:documented.length===2?3:0, s:documented.length===2?"warn":"fail", t:"At least 3 documented projects",
+    saw:`${documented.length} of the ${repos.length} projects you picked ${documented.length===1?"has":"have"} a real README.`,
+    why:"Three projects is enough to show range without spreading yourself thin.",
+    next:"You don't need to build something new. A well-documented class project counts. Pick your next best one and write its README using the starter in the project section below.",
+    fix:"Get to three finished projects, each with a complete README. Class projects count.", g:"Part 1, The Portfolio Framework"});
+
+  // READMEs
+  const avgCov = repos.length ? repos.reduce((a,r)=>a+r.rd.coverage,0)/repos.length : 0;
+  const counts = {};
+  repos.forEach(r=>r.rd.missing.forEach(m=>counts[m]=(counts[m]||0)+1));
+  const topMissing = Object.entries(counts).sort((a,b)=>b[1]-a[1]).filter(([,n])=>n>=Math.ceil(repos.length/2)).map(([m])=>m);
+  const noVisual = repos.filter(r=>r.rd.exists && !r.rd.visual).length;
+  const bestRepo = repos.slice().sort((a,b)=>b.rd.coverage-a.rd.coverage)[0];
+  if (avgCov >= .8) add({cat:"readme", pts:35, earned:Math.round(avgCov*35), s:"pass", t:"README completeness",
+    saw:`Your READMEs cover ${Math.round(avgCov*100)}% of what the guide recommends. A recruiter can tell what each project does, how it was built, and what it produced.`});
+  else {
+    const promptFor = l => SECTIONS[TRACK].find(s=>s.label===l)?.prompt;
+    const tips = topMissing.slice(0,2).map(m=>`<b>${esc(m)}:</b> ${esc(promptFor(m)||"")}`).join("<br>");
+    add({cat:"readme", pts:35, earned:Math.round(avgCov*35), s:avgCov>=.5?"warn":"fail", t:"README completeness",
+      saw:`Your READMEs cover ${Math.round(avgCov*100)}% of what the guide recommends.${bestRepo && bestRepo.rd.coverage>=.5?` <code>${esc(bestRepo.repo.name)}</code> is your strongest one, so use it as a model for the others.`:""}${topMissing.length?` The sections most often missing are ${topMissing.slice(0,3).map(esc).join(", ")}.`:""}${noVisual?` ${noVisual} ${noVisual===1?"doesn't":"don't"} have a screenshot or demo yet.`:""}`,
+      why:"A recruiter spending two minutes on a repository should be able to answer three questions: what does this do, how was it built, and what did it produce?",
+      next: (tips ? tips + "<br>" : "") + (noVisual ? "<b>Visuals:</b> add a screenshot, short GIF, or live demo link so a recruiter can see it without running your code." : ""),
+      fix: topMissing.length ? `Add ${topMissing.slice(0,2).join(" and ")} sections to your READMEs${noVisual?", plus a screenshot or demo":""}.` : "Add a screenshot or demo link to each README.",
+      g:"Part 2, Writing a Strong README"});
+  }
+
+  // Names
+  const badNames = repos.filter(r=>r.nm.s!=="pass");
+  const nmFrac = repos.length ? (repos.length - badNames.length + repos.filter(r=>r.nm.s==="warn").length*.5)/repos.length : 0;
+  if (!badNames.length) add({cat:"org", pts:5, earned:5, s:"pass", t:"Clear repository names", saw:"Every project name describes the work. Recruiters can scan your pins at a glance."});
+  else add({cat:"org", pts:5, earned:Math.round(nmFrac*5), s:nmFrac>=.5?"warn":"fail", t:"Clear repository names",
+    saw:`${listNames(badNames.map(r=>r.repo.name))} could be clearer.`,
+    why:"Names like finalproject or a course code don't tell a recruiter anything. They decide which pins to open based on the name.",
+    next:"Rename from the repository's Settings page. GitHub redirects the old link, so nothing breaks. Suggestions for each project are in the project section below.",
+    fix:"Rename vague repositories to describe the work.", g:"Part 2, Common Mistakes to Avoid"});
+
+  // Descriptions
+  const undesc = repos.filter(r=>!r.described);
+  const descFrac = repos.length ? (repos.length-undesc.length)/repos.length : 0;
+  if (!undesc.length) add({cat:"org", pts:5, earned:5, s:"pass", t:"One-line descriptions", saw:"Every project has a description, which shows on your pinned cards."});
+  else add({cat:"org", pts:5, earned:Math.round(descFrac*5), s:descFrac>=.5?"warn":"fail", t:"One-line descriptions",
+    saw:`${listNames(undesc.map(r=>r.repo.name))} ${undesc.length===1?"has":"have"} no description.`,
+    why:"The description appears right under the name on your pinned cards. It's free real estate.",
+    next:"On the repository page, click the gear next to About and write one line on what it does, like <i>Web app that shows open study rooms on campus in real time</i>.",
+    fix:"Add a one-line description to each repository's About box.", g:"Part 2, How Recruiters Review Your Profile"});
+
+  // Files
+  const messy = repos.filter(r=>r.messy.length);
+  const cleanFrac = repos.length ? (repos.length-messy.length)/repos.length : 0;
+  if (!messy.length) add({cat:"org", pts:5, earned:5, s:"pass", t:"Clean files and folders", saw:"No leftover test files or draft-style names at the top level."});
+  else add({cat:"org", pts:5, earned:Math.round(cleanFrac*5), s:cleanFrac>=.5?"warn":"fail", t:"Clean files and folders",
+    saw:`${listNames(messy.map(r=>r.repo.name))} ${messy.length===1?"has":"have"} leftover or draft-style files.`,
+    why:"Organization signals professionalism. Files like CIT300_FINAL_v3 suggest the work was turned in, not finished.",
+    next:"The project section below lists each file and what to do with it.",
+    fix:"Clean up leftover test files and draft-style filenames.", g:"Part 1, What Sets a Strong Portfolio Apart"});
+
+  // Incremental commits
+  const single = repos.filter(r=>r.commitS==="fail");
+  const incFrac = repos.length ? repos.reduce((a,r)=>a+(r.commitS==="pass"?1:r.commitS==="warn"?.5:0),0)/repos.length : 0;
+  if (incFrac >= .9) add({cat:"activity", pts:6, earned:Math.round(incFrac*6), s:"pass", t:"Work pushed incrementally", saw:"Your projects show steady commits over several days, which tells the story of how you built them."});
+  else add({cat:"activity", pts:6, earned:Math.round(incFrac*6), s:incFrac>=.5?"warn":"fail", t:"Work pushed incrementally",
+    saw: single.length ? `${listNames(single.map(r=>r.repo.name))} ${single.length===1?"looks":"look"} like a single upload.` : "Some projects have only a few commits.",
+    why:"A history of small commits shows how you work and that you built it over time.",
+    next:"You can't change past history, and that's fine. Going forward, commit after each meaningful change with a message that says what changed, like <i>Add filter by building</i>. Your next round of README edits is a great place to start.",
+    fix:"Push work in small commits as you go.", g:"Part 2, Contribution Graph"});
+
+  // Spread
+  const since = Date.now() - 365*864e5, months = new Set();
+  repos.forEach(r=>r.cs.dates.forEach(d=>{ if (Date.parse(d)>=since) months.add(d.slice(0,7)); }));
+  const mE = Math.round(Math.min(months.size/6,1)*4);
+  if (months.size >= 6) add({cat:"activity", pts:4, earned:mE, s:"pass", t:"Activity across the year", saw:`You committed to these projects in ${months.size} of the last 12 months. That steady activity shows on your contribution graph.`});
+  else add({cat:"activity", pts:4, earned:mE, s:months.size>=3?"warn":"fail", t:"Activity across the year",
+    saw:`You committed to these projects in ${months.size} of the last 12 months.`,
+    why:"A contribution graph that goes dark between semesters tells a weaker story than steady engagement. You don't need to commit every day.",
+    next:"Pick one project to keep improving between semesters, even with small updates like README edits or a new feature.",
+    fix:"Keep one project going between semesters.", g:"Part 2, Contribution Graph"});
+
+  // Self-checks
+  SELF_QS.forEach(q => {
+    const a = state.answers[q.id];
+    add({cat:q.cat, pts:q.pts, t:q.t, self:q.id, q:q.q, s:a===true?"pass":a===false?"fail":"ask", earned:a===true?q.pts:0,
+      saw: a===true ? "Done." : "", why: a===false ? q.why : "", next: a===false ? q.next : "", fix:q.fix, g:q.g});
+  });
+  return items;
+}
+function totals(items){
+  const cats = {};
+  Object.keys(CAT_INFO).forEach(k=>cats[k]={earned:0,max:0});
+  items.forEach(i=>{cats[i.cat].earned+=i.earned; cats[i.cat].max+=i.pts;});
+  return {cats, total:Object.values(cats).reduce((a,c)=>a+c.earned,0)};
+}
+function band(score){
+  if (score>=85) return {t:"Recruiter-ready", c:"var(--good)"};
+  if (score>=70) return {t:"Almost there", c:"var(--good)"};
+  if (score>=50) return {t:"Solid foundation", c:"var(--warn)"};
+  return {t:"Getting started", c:"var(--bad)"};
+}
+const STRENGTH_LINES = {
+  profile:"your profile gives a recruiter a clear first impression",
+  lineup:"you have enough projects to show range",
+  readme:"your READMEs explain your work clearly",
+  org:"your projects are named and organized professionally",
+  activity:"your commit history shows steady work over time"
+};
+function coachSummary(items, cats){
+  const pct = k => cats[k].max ? cats[k].earned/cats[k].max : 0;
+  const keys = Object.keys(CAT_INFO);
+  const best = keys.slice().sort((a,b)=>pct(b)-pct(a))[0];
+  const worst = keys.slice().sort((a,b)=>pct(a)-pct(b))[0];
+  const first = items.filter(i=>i.earned<i.pts && i.s!=="ask").sort((a,b)=>(b.pts-b.earned)-(a.pts-a.earned))[0];
+  const parts = [];
+  if (pct(best) >= .6) parts.push(`<p><b>What's working:</b> ${STRENGTH_LINES[best]}. That's a real strength to build on.</p>`);
+  if (pct(worst) < .8 && worst !== best) parts.push(`<p><b>Biggest opportunity:</b> ${CAT_INFO[worst].label.toLowerCase()}. This is where a little effort will change how your profile reads the most.</p>`);
+  if (first) parts.push(`<p><b>If you only do one thing this week:</b> ${first.fix.charAt(0).toLowerCase()+first.fix.slice(1)}</p>`);
+  return parts.join("");
+}
+
+/* ---------- GitHub API ---------- */
+async function gh(path, {allow404=false}={}){
+  let r;
+  try { r = await fetch(GH+path, {headers:{Accept:"application/vnd.github+json"}}); }
+  catch(e){ throw {code:"network"}; }
+  if (r.status===403 || r.status===429){
+    const rem = r.headers.get("x-ratelimit-remaining"), reset = r.headers.get("x-ratelimit-reset");
+    if (rem==="0" || r.status===429) throw {code:"rate", reset};
+  }
+  if (r.status===404){ if (allow404) return null; throw {code:"notfound"}; }
+  if (r.status===409) return null;
+  if (!r.ok) throw {code:"http", status:r.status};
+  return r.json();
+}
+function decodeB64(s){
+  try { const bin = atob((s||"").replace(/\n/g,"")); return new TextDecoder().decode(Uint8Array.from(bin, c=>c.charCodeAt(0))); }
+  catch(e){ return ""; }
+}
+async function getReadme(owner, repo){
+  const j = await gh(`/repos/${owner}/${encodeURIComponent(repo)}/readme`, {allow404:true});
+  return j ? decodeB64(j.content) : null;
+}
+function errText(e, user){
+  if (e.code==="notfound") return `We couldn't find a GitHub user named "${esc(user)}". Check the spelling at github.com/${esc(user)}.`;
+  if (e.code==="rate"){
+    const t = e.reset ? new Date(e.reset*1000).toLocaleTimeString([], {hour:"numeric", minute:"2-digit"}) : "an hour";
+    return `GitHub limits how many checks one network can run each hour, and this network has hit the limit. Try again after ${t}. Campus Wi-Fi is shared by many students, so switching to another network can also help.`;
+  }
+  if (e.code==="network") return "This page couldn't reach GitHub. Check your internet connection and try again. (Previewing inside Claude? Live checks only run on the hosted copy of this tool.)";
+  return `GitHub returned an error (${esc(e.status||"unknown")}). Try again in a minute.`;
+}
+
+/* ---------- State and flow ---------- */
+let state = null, pending = null;
+const smooth = () => matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth";
+function setStatus(msg, kind="info"){
+  const el = $("#status");
+  if (!msg){ el.hidden = true; return; }
+  el.className = "status " + kind; el.innerHTML = msg; el.hidden = false;
+}
+function parseUser(v){
+  v = (v||"").trim().replace(/^@/,"");
+  const m = v.match(/github\.com\/([^\/?#\s]+)/i);
+  if (m) v = m[1];
+  return v.replace(/\/+$/,"");
+}
+
+$("#lookup").addEventListener("submit", async ev => {
+  ev.preventDefault();
+  const u = parseUser($("#username").value);
+  if (!u || !/^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i.test(u)){ setStatus("Enter a GitHub username, like the part after github.com/ in your profile link.", "err"); return; }
+  const btn = $("#findBtn"); btn.disabled = true; setStatus("Looking up your profile…");
+  $("#pickPanel").hidden = true;
+  if (state && state.sample){ state = null; $("#results").innerHTML = ""; }
+  try {
+    const user = await gh(`/users/${u}`);
+    const repos = await gh(`/users/${u}/repos?per_page=100&sort=pushed&type=owner`);
+    const social = await gh(`/users/${u}/social_accounts`, {allow404:true}).catch(()=>[]) || [];
+    const profileRepo = repos.find(r => r.name.toLowerCase() === user.login.toLowerCase());
+    const profileReadme = profileRepo ? await getReadme(user.login, profileRepo.name) : null;
+    const own = repos.filter(r => !r.fork && r !== profileRepo);
+    pending = {user, social, profileReadme, repos: own};
+    if (!own.length){ setStatus(`We didn't find any public repositories of your own on ${esc(user.login)}. Make your strongest projects public, then run the check again.`, "err"); return; }
+    setStatus("");
+    renderPicker();
+  } catch(e){ setStatus(errText(e,u), "err"); }
+  finally { btn.disabled = false; }
+});
+
+function renderPicker(){
+  $("#repoList").innerHTML = pending.repos.map((r,i)=>`
+    <label><input type="checkbox" id="pick-${i}" value="${i}" ${i<5?"checked":""}>
+      <span><span class="nm">${esc(r.name)}</span><span class="ds">${esc(r.description||"No description")}</span></span>
+      <span class="lang">${esc(r.language||"")}</span></label>`).join("");
+  $("#pickPanel").hidden = false;
+  updatePickCount();
+  $("#repoList").onchange = updatePickCount;
+  $("#pickPanel").scrollIntoView({behavior:smooth(), block:"start"});
+}
+const picked = () => [...$("#repoList").querySelectorAll("input:checked")].map(i=>pending.repos[+i.value]);
+function updatePickCount(){
+  const n = picked().length;
+  $("#pickCount").textContent = n > MAX_PICK ? `Pick ${MAX_PICK} or fewer (you have ${n}).` : `${n} selected`;
+  $("#scanBtn").disabled = n===0 || n>MAX_PICK;
+}
+
+$("#scanBtn").addEventListener("click", async () => {
+  const sel = picked(); if (!sel.length || sel.length>MAX_PICK) return;
+  const btn = $("#scanBtn"); btn.disabled = true;
+  const owner = pending.user.login;
+  try {
+    const raws = [];
+    for (let i=0;i<sel.length;i++){
+      const r = sel[i], name = encodeURIComponent(r.name);
+      setStatus(`Checking ${esc(r.name)} (${i+1} of ${sel.length})…`);
+      const [readme, contents, commits] = await Promise.all([
+        getReadme(owner, r.name),
+        gh(`/repos/${owner}/${name}/contents`, {allow404:true}).then(x=>Array.isArray(x)?x:[]),
+        gh(`/repos/${owner}/${name}/commits?per_page=100`, {allow404:true}).then(x=>Array.isArray(x)?x:[])
+      ]);
+      raws.push({repo:r, readme, contents, commits});
+    }
+    state = {user:pending.user, social:pending.social, profileReadme:pending.profileReadme,
+      profile:analyzeProfile(pending.user, pending.social, pending.profileReadme),
+      repos:raws.map(x=>analyzeRepo(x, TRACK)), answers:{}, sample:false};
+    setStatus(""); $("#pickPanel").hidden = true;
+    render();
+    $("#results").scrollIntoView({behavior:smooth(), block:"start"});
+  } catch(e){ setStatus(errText(e, owner), "err"); }
+  finally { btn.disabled = false; }
+});
+
+/* ---------- Rendering ---------- */
+const PILL = {pass:"Strong", warn:"Getting there", fail:"Next step", ask:"Your call"};
+const snippets = [];
+function snippetBlock(text, label){
+  const id = snippets.push(text) - 1;
+  return `<details><summary class="note" style="cursor:pointer">${esc(label.replace(/^Copy /,"Show "))}</summary>
+    <div style="display:grid;gap:8px;margin-top:8px"><pre class="snippet" id="snip-${id}">${esc(text)}</pre>
+    <div class="copyrow"><button class="btn small" type="button" data-copy="${id}">${esc(label)}</button><span class="note" role="status"></span></div></div></details>`;
+}
+function checkRow(i){
+  const body = [];
+  if (i.self){
+    body.push(`<p>${esc(i.q)}</p><div class="yn" role="group" aria-label="${esc(i.t)}"><button type="button" data-q="${i.self}" data-v="yes" aria-pressed="${state.answers[i.self]===true}">Yes</button><button type="button" data-q="${i.self}" data-v="no" aria-pressed="${state.answers[i.self]===false}">Not yet</button></div>`);
+  } else if (i.saw) body.push(`<p>${i.saw}</p>`);
+  if (i.why) body.push(`<p class="why">Why it matters: ${esc(i.why)}</p>`);
+  if (i.next) body.push(`<div class="try"><b>Try this:</b> ${i.next}</div>`);
+  if (i.snippet) body.push(snippetBlock(i.snippet, i.snippetLabel));
+  return `<div class="check">
+    <div class="head"><span class="pill ${i.s}">${PILL[i.s]}</span><span class="t">${esc(i.t)}</span></div>
+    <span class="pts">${i.earned}/${i.pts}</span>
+    <div class="body">${body.join("")}</div></div>`;
+}
+function repoCard(r){
+  const secs = SECTIONS[TRACK].map(s=>`<span class="chip ${r.rd.found.includes(s.label)?"on":"off"}">${s.label}</span>`).join("") +
+    `<span class="chip ${r.rd.visual?"on":"off"}">Screenshot or demo</span>`;
+  const wins = [], grow = [];
+  // README
+  if (!r.rd.exists) grow.push({t:"Add a README", how:"Recruiters won't dig through code to figure out what this does. Start with the starter below and fill in each section."});
+  else if (r.rd.template) grow.push({t:"Replace the default template text", how:"The README still has the text your framework generated. Swap it for your own description using the starter below."});
+  else {
+    if (r.rd.found.length >= 3) wins.push(`The README covers ${r.rd.found.length} of the ${SECTIONS[TRACK].length} recommended sections.`);
+    if (r.rd.short) grow.push({t:"Expand the README", how:"It's very short right now. Even three or four sentences per section will make a difference."});
+    const missing = SECTIONS[TRACK].filter(s=>!r.rd.found.includes(s.label));
+    missing.slice(0,3).forEach(s=>grow.push({t:`Add ${s.label}`, how:s.prompt}));
+    if (missing.length > 3) grow.push({t:`Also add ${missing.slice(3).map(s=>s.label).join(" and ")}`, how:"See the starter below for where these go."});
+    if (r.rd.placeholder) grow.push({t:"Finish or remove placeholder text", how:"Phrases like \"coming soon\" or \"TODO\" signal the project isn't done. A finished small project beats an unfinished ambitious one."});
+  }
+  if (r.rd.visual) wins.push("Includes a screenshot, demo, or link a recruiter can see without running the code.");
+  else grow.push({t:"Add a screenshot or demo", how:"Take a screenshot or short screen recording and add it near the top of the README. If it's deployed, link the live version."});
+  // Name and description
+  if (r.nm.s==="pass") wins.push("The name tells a recruiter what this is.");
+  else grow.push({t:"Rename the repository", how:r.nm.msg});
+  if (r.described) wins.push("Has a one-line description on its card.");
+  else grow.push({t:"Add a one-line description", how:"Click the gear next to About on the repository page."});
+  // Files
+  if (!r.messy.length) wins.push("Top-level files look clean and intentional.");
+  else grow.push({t:`Tidy up ${r.messy.length} file${r.messy.length===1?"":"s"}`, how:r.messy.slice(0,5).map(m=>`<code>${esc(m.name)}</code> is ${m.why}: ${m.fix}.`).join("<br>")});
+  // Commits
+  const cmsg = `${r.cs.capped?"100+":r.cs.count} commit${r.cs.count===1?"":"s"} across ${r.cs.days} day${r.cs.days===1?"":"s"}`;
+  if (r.commitS==="pass") wins.push(`${cmsg}, which shows steady work.`);
+  else grow.push({t:"Build a commit history from here", how:`So far: ${cmsg}. Each improvement above is a chance to commit with a clear message, like <i>Add How to Run section</i>.`});
+
+  const starter = (!r.rd.exists || r.rd.coverage < 1) ? snippetBlock(readmeStarter(r), "Copy README starter for this project") : "";
+  return `<article class="repo">
+    <header><h3><a href="${esc(r.repo.html_url||"#")}" target="_blank" rel="noopener">${esc(r.repo.name)}</a></h3><span class="meta">${esc(r.repo.language||"")}</span></header>
+    ${r.repo.description?`<div class="meta" style="margin-top:-8px">${esc(r.repo.description)}</div>`:""}
+    <div><div class="cov">README sections · ${Math.round(r.rd.coverage*100)}% complete</div><div class="chips" style="margin-top:6px">${secs}</div></div>
+    <div class="split">
+      <div><h4>What's working</h4>${wins.length?`<ul class="wins">${wins.map(w=>`<li><span>${w}</span></li>`).join("")}</ul>`:`<p class="note">Every project starts somewhere. The steps on the right will get this one recruiter-ready.</p>`}</div>
+      <div><h4>To strengthen it</h4>${grow.length?`<ul class="grow">${grow.map(g=>`<li><b>${g.t}</b><span class="how">${g.how}</span></li>`).join("")}</ul>`:`<p class="note">Nothing to add. This one is ready to pin.</p>`}</div>
+    </div>
+    ${starter}
+  </article>`;
+}
+function render(){
+  snippets.length = 0;
+  const items = buildChecks(state);
+  const {cats, total} = totals(items);
+  const b = band(total);
+  const unanswered = items.filter(i=>i.s==="ask").length;
+  const C = 2*Math.PI*62, off = C*(1-total/100);
+  const fixes = items.filter(i=>i.earned<i.pts && i.s!=="ask").sort((a,c)=>(c.pts-c.earned)-(a.pts-a.earned)).slice(0,5);
+  const u = state.user;
+  const profileItems = items.filter(i=>i.cat!=="readme" || true);
+
+  $("#results").innerHTML = `
+    ${state.sample ? `<div class="banner"><b>Sample</b><span>This is an example report for a fictional student. Enter your username above to check your own profile.</span></div>` : ""}
+    <section class="panel summary" aria-label="Score summary">
+      <div class="dial" role="img" aria-label="Score ${total} out of 100">
+        <svg viewBox="0 0 150 150"><circle cx="75" cy="75" r="62" fill="none" stroke="var(--sunken)" stroke-width="12"/>
+          <circle class="v" cx="75" cy="75" r="62" fill="none" stroke="${b.c}" stroke-width="12" stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="${off}"/></svg>
+        <div class="num"><b>${total}</b><small>out of 100</small></div>
+      </div>
+      <div style="min-width:0">
+        <div class="who">${u.avatar_url?`<img src="${esc(u.avatar_url)}" alt="">`:""}<div><div style="font-weight:600">${esc(u.name||u.login)}</div><div class="handle">github.com/${esc(u.login)}</div></div></div>
+        <div class="band" style="color:${b.c}">${b.t}</div>
+        ${unanswered?`<p class="note" style="margin-top:4px">Answer the ${unanswered} quick question${unanswered>1?"s":""} in Profile and portfolio to finish your score.</p>`:""}
+        <div class="cats">${Object.entries(CAT_INFO).map(([k,c])=>`
+          <div class="cat"><span>${c.label}</span><span class="bar"><i style="width:${cats[k].max?Math.round(cats[k].earned/cats[k].max*100):0}%"></i></span><span class="pts">${cats[k].earned}/${cats[k].max}</span></div>`).join("")}</div>
+      </div>
+    </section>
+
+    <section class="coachnote" aria-label="Summary">${coachSummary(items, cats)}</section>
+
+    ${fixes.length ? `<section class="sect"><h2>Where to start</h2><p>These are worth the most, so tackle them in order. Each one points to the part of the guide that explains it.</p>
+      <ol class="fixes">${fixes.map(f=>`<li><div><div class="t">${esc(f.fix)}</div><div class="g">Worth up to ${f.pts-f.earned} points · Guide: ${esc(f.g)}</div></div></li>`).join("")}</ol></section>` : ""}
+
+    <section class="sect"><h2>Profile and portfolio</h2><p>What we noticed, why it matters to a recruiter, and what to try next.</p>
+      <div class="checks">${profileItems.map(checkRow).join("")}</div></section>
+
+    <section class="sect"><h2>Your projects</h2><p>What a recruiter sees when they open each repository. Filled chips are README sections we found.</p>
+      <div class="repos">${state.repos.map(repoCard).join("")}</div></section>
+
+    <section class="panel sect"><h2 style="font-size:20px">Before you meet with a career coach</h2>
+      <p>This check can't judge fit. Ask yourself these about each project, from Part 1 of the guide. A strong project gets a yes to at least four.</p>
+      <ul class="reflect"><li>Does it reflect the tools and technologies used in the roles I'm targeting?</li><li>Does it show my strongest and most marketable skills?</li><li>Is it functional enough that someone could actually use or see it?</li><li>Would a company recognize it as valuable work?</li><li>Does it highlight skills commonly needed in my target field?</li></ul>
+      <div class="actions"><button class="btn" id="copyBtn" type="button">Copy my report</button>${window.self===window.top?`<button class="btn ghost" id="printBtn" type="button">Print or save as PDF</button>`:""}<span class="note" id="copyMsg" role="status"></span></div>
+      <p class="note">Paste your report into an email or bring it to a career coaching appointment. Coaches can help with presentation and how you talk about your projects. For technical questions, connect with your professors and your academic department.</p>
+    </section>
+    <p class="foot">This tool checks how your work is presented. It does not review code or judge technical quality. Scores are a guide for what to improve next, not a measure of you as a candidate. GitHub's pinned repositories and contribution graph aren't available to this tool, so the questions above fill those gaps.</p>`;
+
+  $("#results").querySelectorAll(".yn button").forEach(btn=>btn.addEventListener("click", ()=>{
+    state.answers[btn.dataset.q] = btn.dataset.v==="yes"; render();
+    const again = $(`#results .yn button[data-q="${btn.dataset.q}"][data-v="${btn.dataset.v}"]`); if (again) again.focus();
+  }));
+  $("#results").querySelectorAll("[data-copy]").forEach(btn=>btn.addEventListener("click", ()=>{
+    copyText(snippets[+btn.dataset.copy], btn.nextElementSibling, $(`#snip-${btn.dataset.copy}`));
+  }));
+  $("#copyBtn").addEventListener("click", ()=>copyText(reportText(), $("#copyMsg"), null));
+  const pb = $("#printBtn"); if (pb) pb.addEventListener("click", ()=>window.print());
+}
+function copyText(text, msgEl, preEl){
+  const fail = () => {
+    if (preEl){ const sel = getSelection(), rg = document.createRange(); rg.selectNodeContents(preEl); sel.removeAllRanges(); sel.addRange(rg); msgEl.textContent = "Copying isn't allowed here. The text is selected, so press Ctrl+C or Cmd+C."; }
+    else {
+      const ta = document.createElement("textarea"); ta.value = text; ta.rows = 10; ta.style.width = "100%"; ta.id = "reportText";
+      msgEl.replaceWith(ta); ta.select();
+      ta.insertAdjacentHTML("beforebegin", `<span class="note">Copying isn't allowed here. Select the text below and copy it.</span>`);
+    }
+  };
+  try { navigator.clipboard.writeText(text).then(()=>{ msgEl.textContent = "Copied."; }, fail); } catch(e){ fail(); }
+}
+function reportText(){
+  const strip = s => String(s||"").replace(/<[^>]+>/g,"").replace(/&quot;/g,'"').replace(/&#39;/g,"'").replace(/&amp;/g,"&").replace(/&lt;/g,"<").replace(/&gt;/g,">");
+  const items = buildChecks(state), {total, cats} = totals(items), b = band(total);
+  return [
+    `GitHub Portfolio Check: github.com/${state.user.login}`,
+    `Score: ${total}/100 (${b.t})`, "",
+    ...Object.entries(CAT_INFO).map(([k,c])=>`${c.label}: ${cats[k].earned}/${cats[k].max}`), "",
+    strip(coachSummary(items, cats).replace(/<\/p>/g,"\n")), "",
+    "Where to start:",
+    ...items.filter(i=>i.earned<i.pts && i.s!=="ask").sort((a,c)=>(c.pts-c.earned)-(a.pts-a.earned)).slice(0,5).map(i=>`- ${strip(i.fix)}`), "",
+    "Projects checked:",
+    ...state.repos.map(r=>`- ${r.repo.name}: README ${Math.round(r.rd.coverage*100)}% complete, ${r.cs.count} commits over ${r.cs.days} days`)
+  ].join("\n");
+}
+
+/* ---------- Sample report (fictional student) ---------- */
+function sampleState(){
+  const day = 864e5, now = Date.now();
+  const iso = d => new Date(now - d*day).toISOString();
+  const commitsOn = days => days.map(d=>({commit:{author:{date:iso(d)}}}));
+  const avatar = "data:image/svg+xml;utf8," + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 44 44"><rect width="44" height="44" fill="#012169"/><text x="22" y="28" font-family="Arial" font-size="16" font-weight="700" fill="#f2a900" text-anchor="middle">SS</text></svg>`);
+  const user = {login:"sample-student", name:"Sample Student", bio:"CS + QTM at Emory. Interested in data engineering.", blog:"", avatar_url:avatar};
+  const profileReadme = "# Hi, I'm Sample\n\nI'm a junior studying Computer Science and QTM.\n\n## Tools\nPython · SQL · pandas · React\n";
+  const mk = (name, desc, lang) => ({name, description:desc, language:lang, html_url:`https://github.com/sample-student/${name}`});
+  const raws = [
+    {repo:mk("study-room-finder","Web app that shows open study rooms on campus in real time","JavaScript"),
+     readme:"# Study Room Finder\n\nA web app that shows which campus study rooms are open right now, so students stop wandering between buildings.\n\n![screenshot](docs/screenshot.png)\n\n## Features\n- Live availability map\n- Favorites\n- Filters by building\n\n## Built With\nReact, Node.js, PostgreSQL\n\n## How to Run\n```\nnpm install\nnpm start\n```\n\n## What I Learned\nHandling real-time updates with websockets.",
+     contents:[{name:"src"},{name:"docs"},{name:"package.json"},{name:"README.md"}], commits:commitsOn([3,5,9,14,20,28,35,41,60,75,90])},
+    {repo:mk("finalproject","Text adventure game with saved progress","Python"),
+     readme:"# finalproject\nCS 170 final. coming soon", contents:[{name:"main.py"},{name:"test2.py"},{name:"CS170_FINAL_v3.py"},{name:".DS_Store"}], commits:commitsOn([200])},
+    {repo:mk("nba-shot-analysis","","Jupyter Notebook"),
+     readme:"# NBA Shot Analysis\n\nThis project looks at which areas of the court produce the most points per shot attempt across five NBA seasons, and how that has changed.\n\n## Data\nPlay-by-play shot data from a public Kaggle dataset.\n\n## Methods\nCleaned and grouped shots by zone, then compared efficiency by season.\n\n## Results\nCorner threes produced the highest points per attempt in every season.\n\n## Tools\nPython, pandas, matplotlib",
+     contents:[{name:"analysis.ipynb"},{name:"data"},{name:"README.md"}], commits:commitsOn([110,112,118,125,140])}
+  ];
+  return {user, social:[], profileReadme, profile:analyzeProfile(user, [], profileReadme), repos:raws.map(x=>analyzeRepo(x,TRACK)), answers:{email:true, pinned:false}, sample:true};
+}
+
+window.__portfolioCheck = {analyzeReadme, analyzeRepo, analyzeProfile, buildChecks, totals, sampleState, nameStatus, messyFiles, readmeStarter, coachSummary};
+state = sampleState();
+render();
+})();
+</script>
+
+</body>
+</html>
