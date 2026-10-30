@@ -86,6 +86,6 @@ A single HTML file with no installation, no accounts, and no server.
 
 <div align="center">
 
-Created by **Nydia Araya-Stivers, M.Ed.**, Professional Career Coach
+Created by **Nydia, Professional Career Coach
 
 </div>
