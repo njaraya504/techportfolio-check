@@ -53,9 +53,10 @@ Good to Know
 GitHub limits how many lookups one network can make each hour. On shared Wi-Fi during a busy workshop, students may see a message asking them to try again later. Switching to phone data solves it.
 
 Tools and Technologies
+
 HTML, CSS, and JavaScript in a single file, with no installation needed
 GitHub REST API for public profile and repository data
 Hosted on GitHub Pages
-Credits
 
-Created by Nydia Araya-Stivers, M.Ed., Professional Career Coach. Feedback is based on the Building a Technical Portfolio guide.
+
+Created by Nydia Araya-Stivers, M.Ed., Professional Career Coach. 
