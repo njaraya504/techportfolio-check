@@ -19,7 +19,8 @@
 
 Students often ask how to apply portfolio advice to their own GitHub, and whether their profile is ready to share with employers. This tool answers that in a few minutes. Enter your GitHub username, pick the projects you'd show a recruiter, and get a score out of 100 with specific, encouraging feedback on what to improve next.
 
-The checks are based on the *Building a Technical Portfolio* guide.
+The checks are based on this <a href="https://cpd.emory.edu/resources/311735/"> GitHub Portfolio Building Guide</a>
+
 
 ## How It Works
 
